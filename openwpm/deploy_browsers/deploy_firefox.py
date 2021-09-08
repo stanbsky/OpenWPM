@@ -177,6 +177,13 @@ def deploy_firefox(
         logger.debug(
             "BROWSER %i: OpenWPM Firefox extension loaded" % browser_params.browser_id
         )
+        # Install consent-o-matic
+        ext2_loc = os.path.join(root_dir, "../../Extension/consent-o-matic/consent_o_matic.xpi")
+        ext2_loc = os.path.normpath(ext2_loc)
+        driver.install_addon(ext2_loc, temporary=True)
+        logger.debug(
+            "BROWSER %i: Consent-O-Matic Firefox extension loaded" % browser_params.browser_id
+        )
 
     # set window size
     driver.set_window_size(*DEFAULT_SCREEN_RES)

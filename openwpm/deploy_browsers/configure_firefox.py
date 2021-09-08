@@ -19,6 +19,7 @@ DEFAULT_GECKODRIVER_PREFS = {
     "app.update.auto": False,
     "browser.dom.window.dump.enabled": True,
     "devtools.console.stdout.chrome": True,
+    "devtools.console.stdout.content": True,
     "browser.safebrowsing.blockedURIs.enabled": False,
     "browser.safebrowsing.downloads.enabled": False,
     "browser.safebrowsing.passwords.enabled": False,
