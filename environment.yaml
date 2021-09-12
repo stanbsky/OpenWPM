@@ -43,4 +43,6 @@ dependencies:
   - types-pyyaml==5.4.3
   - types-redis==3.5.4
   - types-tabulate==0.1.1
+  - lxml==4.6.3
+  - cssselect==1.1.0
 name: openwpm

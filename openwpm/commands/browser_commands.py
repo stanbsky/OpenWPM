@@ -518,22 +518,3 @@ class InitializeCommand(BaseCommand):
 
         msg = {"action": "Initialize", "visit_id": self.visit_id}
         extension_socket.send(msg)
-
-
-class AcceptCookieNoticeCommand(BaseCommand):
-
-    def __init__(self, sleep):
-        self.sleep = sleep
-
-    def __repr__(self):
-        return f"AcceptCookieNoticeCommand({self.sleep})"
-
-    def execute(
-        self,
-        webdriver,
-        browser_params,
-        manager_params,
-        extension_socket,
-    ):
-
-        logger.info('I will accept the cookie banner!')

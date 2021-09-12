@@ -10,7 +10,6 @@ from .commands.browser_commands import (
     RecursiveDumpPageSourceCommand,
     SaveScreenshotCommand,
     ScreenshotFullPageCommand,
-    AcceptCookieNoticeCommand,
 )
 from .commands.profile_commands import DumpProfileCommand
 from .commands.types import BaseCommand
@@ -196,15 +195,3 @@ class CommandSequence:
         commands.insert(0, (InitializeCommand(), 10))
         commands.append((FinalizeCommand(sleep=5), 10))
         return commands
-
-    def accept_cookie_notice(self, suffix="", timeout=30) -> None:
-        """Accept the cookie notice"""
-        self.total_timeout += timeout
-        if not self.contains_get_or_browse:
-            raise CommandExecutionError(
-                "No get or browse request preceding the accept cookie notice command",
-                self,
-            )
-        command = AcceptCookieNoticeCommand(suffix)
-        self._commands_with_timeout.append((command, timeout))
-
