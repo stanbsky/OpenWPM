@@ -72,7 +72,7 @@ additional_css_selectors = ['#cookie-notice','#global-cookie-message', '#qcCmpUi
 
 def get_idcac_css_selectors():
     r = requests.get(IDCAC_URL)
-    css_selectors = set(additional_css_selectors)
+    css_selectors = [] + additional_css_selectors
 
     for line in r.text.split('\n'):
         first_character = line[0]
@@ -87,7 +87,7 @@ def get_idcac_css_selectors():
             selector_index = line.find('#')
             if selector_index != -1:
                 selector = line[selector_index + 2:]
-                css_selectors.add(selector.strip())
+                css_selectors.append(selector.strip())
             continue
 
         # If the line starts with ## then this indicates a selector. e.g.: ###cookie-notice
@@ -95,7 +95,7 @@ def get_idcac_css_selectors():
             selector = line[2:]
             if selector[0] != '#' and selector[0] != '.':
                 selector = '#{}'.format(selector)
-            css_selectors.add(selector.strip())
+            css_selectors.append(selector.strip())
             continue
 
         # If the line starts with a domain name then site specific selectors. e.g.: site.com###cookie-notice-1,...
@@ -108,11 +108,9 @@ def get_idcac_css_selectors():
             elif selector == 'overlay':
                 continue
             elif selector[0] == '.' or selector[0] == '#':
-                css_selectors.add(selector)
+                css_selectors.append(selector)
             else:
-                css_selectors.add('#{}'.format(selector))
-    return css_selectors
+                css_selectors.append('#{}'.format(selector))
 
-from pprint import pprint
-pprint(get_idcac_css_selectors())
-# get_idcac_css_selectors()
+    css_selectors.remove('#main-wrapper > header[role="banner"] > div:first-child')
+    return list(filter(lambda x: (x[0] == '.' or x[0] == '#') and not (x[0:2] == '#[' or '~' in x or ':' in x), css_selectors))
