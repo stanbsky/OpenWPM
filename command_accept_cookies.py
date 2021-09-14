@@ -11,6 +11,7 @@ from openwpm.socket_interface import ClientSocket
 
 from lxml import html
 from bs4 import BeautifulSoup
+import unicodedata
 
 
 class AcceptCookiesCommand(BaseCommand):
@@ -55,10 +56,9 @@ class AcceptCookiesCommand(BaseCommand):
             self.logger.info('accept_cookies: banner_found, website={}, selector={}'.format(current_url, found_cookie_selector))
             elements = webdriver.find_elements_by_css_selector(found_cookie_selector)
             for element in elements:
-                self._find_accept_btn_and_click(element)
-
+                self._find_accept_btn_and_click(element, webdriver)
         else:
-            self.logger.info('accept_cookies: banner_not_found, website=%s', current_url)
+            self.logger.info('accept_cookies: banner_not_found, website={}'.format(current_url))
         
 
     def _get_cookie_banner_selectors(self, page_source=''):
@@ -81,18 +81,32 @@ class AcceptCookiesCommand(BaseCommand):
                 
         return found_cookie_selector
 
-    def _find_accept_btn_and_click(self, element):
+    def _find_accept_btn_and_click(self, element, webdriver: Firefox):
 
         try:
             soup = BeautifulSoup(element.get_attribute('innerHTML'), 'html.parser')
             buttons = soup.find_all(['button', 'a'])
+            found_accept_button = False
             
             for button in buttons:
-                #TODO: 
                 # 1. Find the accept btn
                 # 2. Get the ID
                 # 3. Click it!
-                self.logger.info('accept_cookies: clickable_item={}, str={}'.format(button, button.get_text()))
+                encoded_call_to_action = str(unicodedata.normalize('NFKD', button.get_text()).encode('ascii', 'ignore').lower())
+                for keyword in {'accept', 'agree', 'yes', 'consent', 'ok'}:
+                    if keyword in encoded_call_to_action:
+                        button_id = button['id']
+                        found_accept_button = True
+                        webdriver.find_element_by_id(button_id).click()
+                        self.logger.info('accept_cookies: accept_button_found, website={}, id={}, call_to_action={}'.format(webdriver.current_url, button_id, encoded_call_to_action))
+                        break
+                
+                if found_accept_button:
+                    break
+            
+            if not found_accept_button:
+                self.logger.warning('accept_cookies: accept_button_not_found, website={}'.format(webdriver.current_url))
+
         except Exception as e:
-            self.logger.error('accept_cookies: error in when parsing cookie banner. message={}'.format(e))
+            self.logger.error('accept_cookies: error in when parsing cookie banner. website={}, message={}'.format(webdriver.current_url, e))
 
