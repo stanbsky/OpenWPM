@@ -2,7 +2,7 @@ import os, requests
 
 IDCAC_URL = 'https://www.i-dont-care-about-cookies.eu/abp/'
 
-additional_css_selectors = ['#cookie-notice','#global-cookie-message', '#qcCmpUi',
+additional_css_selectors = ['#cocc-banner', '#CookieConsentForm', '#sliding-popup', '#cookie-notice','#global-cookie-message', '#qcCmpUi',
                      '#qc-cmp2-ui',
                      '.cookieinfo',
                      '#CybotCookiebotDialog',
