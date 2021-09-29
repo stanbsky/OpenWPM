@@ -12,8 +12,29 @@ from openwpm.socket_interface import ClientSocket
 #from lxml import html
 from bs4 import BeautifulSoup
 import unicodedata
+import re
 
-accept_buttpn_keywords = {'accept', 'agree', 'allow' 'understand', 'continue', 'thank you', 'confirm', 'thanks', 'understood', 'close', 'got it', 'happy' 'ok', 'fine'}
+accept_button_keywords = [
+    re.compile(r'accept'), 
+    re.compile(r'agree'), 
+    re.compile(r'allow'), 
+    re.compile(r'understand'), 
+    re.compile(r'continue'), 
+    re.compile(r'thank you'), 
+    re.compile(r'confirm'), 
+    re.compile(r'thanks'), 
+    re.compile(r'understood'), 
+    re.compile(r'close'), 
+    re.compile(r'got it'), 
+    re.compile(r'happy'), 
+    re.compile(r'fine'), 
+    re.compile(r'yes'), 
+    re.compile(r'no problem'), 
+    re.compile(r'deal'), 
+    re.compile(r'okay'), 
+    re.compile(r'^ok$')
+]
+
 
 
 class AcceptCookiesCommand(BaseCommand):
@@ -100,10 +121,10 @@ class AcceptCookiesCommand(BaseCommand):
                 # 2. Get the ID
                 # 3. Click it!
                 try:
-                    encoded_call_to_action = str(unicodedata.normalize('NFKD', button.get_text()).encode('ascii', 'ignore').lower())
+                    encoded_call_to_action = str(unicodedata.normalize('NFKD', button.get_text()).encode('ascii', 'ignore').lower(), 'ascii')
                     call_to_actions.append(encoded_call_to_action)
-                    for keyword in accept_buttpn_keywords:
-                        if keyword in encoded_call_to_action:
+                    for keyword in accept_button_keywords:
+                        if self._keyword_matches_cta(keyword, encoded_call_to_action):
                             if button['id'] is not None:
                                 button_id = button['id']
                                 found_accept_button = True
@@ -128,3 +149,6 @@ class AcceptCookiesCommand(BaseCommand):
         except Exception as e:
             self.logger.error('accept_cookies: error when parsing cookie banner. website={}, message={}'.format(webdriver.current_url, e))
 
+
+    def _keyword_matches_cta(keyword, encoded_call_to_action):
+        return bool(keyword.search(encoded_call_to_action))
