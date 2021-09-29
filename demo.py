@@ -12,10 +12,10 @@ from idcac_cookie_selectors import get_idcac_css_selectors
 
 # The list of sites that we wish to crawl
 NUM_BROWSERS = 1
-sites = [
- 'https://dwi.gov.uk',
- 'https://www.gamblingcommission.gov.uk/'
- ]
+sites = ['https://www.myworldofwork.co.uk/']
+
+# f = open("sites.txt", "r")
+# sites = f.read().split('\n')
 
 # Loads the default ManagerParams
 # and NUM_BROWSERS copies of the default BrowserParams

@@ -13,6 +13,8 @@ from openwpm.socket_interface import ClientSocket
 from bs4 import BeautifulSoup
 import unicodedata
 
+accept_buttpn_keywords = {'accept', 'agree', 'allow' 'understand', 'continue', 'thank you', 'confirm', 'thanks', 'understood', 'close', 'got it', 'happy' 'ok', 'fine'}
+
 
 class AcceptCookiesCommand(BaseCommand):
     """This command accept the cookies in a website"""
@@ -41,7 +43,7 @@ class AcceptCookiesCommand(BaseCommand):
         # If one of them doesn't have and ID, assign it one
         # Will be used later so that if an Accept Button is found, we can easily target it
         index = 1  
-        clickableElements = webdriver.find_elements_by_tag_name('button') + webdriver.find_elements_by_tag_name('button')
+        clickableElements = webdriver.find_elements_by_tag_name('button') + webdriver.find_elements_by_tag_name('a')
         for element in clickableElements: 
             element_id = element.get_attribute('id')
             if element.get_attribute('id') is None or len(element_id) == 0:
@@ -89,20 +91,28 @@ class AcceptCookiesCommand(BaseCommand):
 
         try:
             soup = BeautifulSoup(element.get_attribute('innerHTML'), 'html.parser')
-            buttons = soup.find_all(['button'])
+            
+            buttons = soup.find_all(['button', 'a'])
             found_accept_button = False
+            call_to_actions = []
             for button in buttons:
                 # 1. Find the accept btn
                 # 2. Get the ID
                 # 3. Click it!
                 try:
                     encoded_call_to_action = str(unicodedata.normalize('NFKD', button.get_text()).encode('ascii', 'ignore').lower())
-                    if button['id'] is not None:
-                        button_id = button['id']
-                        found_accept_button = True
-                        webdriver.find_element_by_id(button_id).click()
-                        self.logger.info('accept_cookies: accept_button_found, website={}, id={}, call_to_action={}'.format(webdriver.current_url, button_id, encoded_call_to_action))
-                        break
+                    call_to_actions.append(encoded_call_to_action)
+                    for keyword in accept_buttpn_keywords:
+                        if keyword in encoded_call_to_action:
+                            if button['id'] is not None:
+                                button_id = button['id']
+                                found_accept_button = True
+                                webdriver.find_element_by_id(button_id).click()
+                                self.logger.info('accept_cookies: accept_button_found, website={}, id={}, call_to_action={}'.format(webdriver.current_url, button_id, encoded_call_to_action))
+                                break
+                            else:
+                                self.logger.warning('accept_cookies: accept_button_not_found_id, website={}, button={}, call_to_action={}, matched_call_to_action={}'.format(webdriver.current_url, webdriver.current_url, button, encoded_call_to_action, keyword))
+
                 except Exception as _:
                     continue
                 
@@ -110,7 +120,10 @@ class AcceptCookiesCommand(BaseCommand):
                     break
             
             if not found_accept_button:
-                self.logger.warning('accept_cookies: accept_button_not_found, website={}'.format(webdriver.current_url))
+                if len(call_to_actions) > 5:
+                    self.logger.warning('accept_cookies: accept_button_not_found, website={}'.format(webdriver.current_url))
+                else:
+                    self.logger.warning('accept_cookies: accept_button_not_found, website={}, buttons={}, call_to_actions={}'.format(webdriver.current_url, buttons, call_to_actions))
 
         except Exception as e:
             self.logger.error('accept_cookies: error when parsing cookie banner. website={}, message={}'.format(webdriver.current_url, e))
