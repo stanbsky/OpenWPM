@@ -150,5 +150,5 @@ class AcceptCookiesCommand(BaseCommand):
             self.logger.error('accept_cookies: error when parsing cookie banner. website={}, message={}'.format(webdriver.current_url, e))
 
 
-    def _keyword_matches_cta(keyword, encoded_call_to_action):
+    def _keyword_matches_cta(self, keyword, encoded_call_to_action):
         return bool(keyword.search(encoded_call_to_action))
