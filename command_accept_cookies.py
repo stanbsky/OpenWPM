@@ -4,6 +4,7 @@ from selenium import webdriver
 
 from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 
 from openwpm.commands.types import BaseCommand
 from openwpm.config import BrowserParams, ManagerParams
@@ -90,6 +91,10 @@ class AcceptCookiesCommand(BaseCommand):
         found_cookie_selector = None
 
         for selector in self.css_selectors:
+
+            if 'footer' in selector:
+                continue
+
             try:
                 elements = webdriver.find_elements_by_css_selector(selector)
                 if len(elements) > 0:
@@ -116,6 +121,7 @@ class AcceptCookiesCommand(BaseCommand):
             buttons = soup.find_all(['button', 'a'])
             found_accept_button = False
             call_to_actions = []
+
             for button in buttons:
                 # 1. Find the accept btn
                 # 2. Get the ID
@@ -134,14 +140,15 @@ class AcceptCookiesCommand(BaseCommand):
                             else:
                                 self.logger.warning('accept_cookies: accept_button_not_found_id, website={}, button={}, call_to_action={}, matched_call_to_action={}'.format(webdriver.current_url, webdriver.current_url, button, encoded_call_to_action, keyword))
 
-                except Exception as _:
+                except Exception as e:
+                    self.logger.error('accept_cookies: accept_button_error, website={}, button={}, error={}', webdriver.current_url, button, e)
                     continue
                 
                 if found_accept_button:
                     break
             
             if not found_accept_button:
-                if len(call_to_actions) > 5:
+                if len(call_to_actions) > 10:
                     self.logger.warning('accept_cookies: accept_button_not_found, website={}'.format(webdriver.current_url))
                 else:
                     self.logger.warning('accept_cookies: accept_button_not_found, website={}, buttons={}, call_to_actions={}'.format(webdriver.current_url, buttons, call_to_actions))
