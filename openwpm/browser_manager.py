@@ -393,7 +393,7 @@ class BrowserManagerHandle:
             except EmptyQueue:
                 self.logger.info(
                     "BROWSER %i: Timeout while executing command, %s, killing "
-                    "browser manager, visit_id %i" % (self.browser_id, repr(command), self.curr_visit_id)
+                    "browser manager" % (self.browser_id, repr(command))
                 )
 
             if status is None:
@@ -750,8 +750,8 @@ class BrowserManager(Process):
 
                 assert isinstance(command, BaseCommand)
                 self.logger.info(
-                    "BROWSER %i: EXECUTING COMMAND: %s, visit_id %i"
-                    % (self.browser_params.browser_id, str(command), self.curr_visit_id)
+                    "BROWSER %i: EXECUTING COMMAND: %s"
+                    % (self.browser_params.browser_id, str(command))
                 )
 
                 # attempts to perform an action and return an OK signal
