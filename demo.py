@@ -1,19 +1,21 @@
 from pathlib import Path
 
 from custom_command import LinkCountingCommand
+from command_accept_cookies import AcceptCookiesCommand
 from openwpm.command_sequence import CommandSequence
 from openwpm.commands.browser_commands import GetCommand
 from openwpm.config import BrowserParams, ManagerParams
 from openwpm.storage.sql_provider import SQLiteStorageProvider
 from openwpm.task_manager import TaskManager
 
+from idcac_cookie_selectors import get_idcac_css_selectors
+
 # The list of sites that we wish to crawl
 NUM_BROWSERS = 1
-sites = [
-    "http://www.example.com",
-    "http://www.princeton.edu",
-    "http://citp.princeton.edu/",
-]
+sites = ['https://www.finance-ni.gov.uk/']
+
+# f = open("sites.txt", "r")
+# sites = f.read().split('\n')
 
 # Loads the default ManagerParams
 # and NUM_BROWSERS copies of the default BrowserParams
@@ -53,6 +55,10 @@ with TaskManager(
     SQLiteStorageProvider(Path("./datadir/crawl-data.sqlite")),
     None,
 ) as manager:
+
+
+    css_selectors = get_idcac_css_selectors()
+
     # Visits the sites
     for index, site in enumerate(sites):
 
@@ -69,9 +75,9 @@ with TaskManager(
         )
 
         # Start by visiting the page
-        command_sequence.append_command(GetCommand(url=site, sleep=3), timeout=60)
-        # Have a look at custom_command.py to see how to implement your own command
-        command_sequence.append_command(LinkCountingCommand())
+        command_sequence.append_command(GetCommand(url=site, sleep=6), timeout=60)
+
+        command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
 
         # Run commands across all browsers (simple parallelization)
         manager.execute_command_sequence(command_sequence)
