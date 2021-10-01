@@ -76,12 +76,12 @@ class AcceptCookiesCommand(BaseCommand):
         found_cookie_selector = self._get_cookie_banner_selectors(webdriver)
 
         if found_cookie_selector is not None:
-            self.logger.info('accept_cookies: banner_found, website={}, selector={}'.format(current_url, found_cookie_selector))
+            self.logger.info('visit_id {}: accept_cookies: banner_found, website={}, selector={}'.format(self.visit_id, current_url, found_cookie_selector))
             elements = webdriver.find_elements_by_css_selector(found_cookie_selector)
             for element in elements:
                 self._find_accept_btn_and_click(element, webdriver)
         else:
-            self.logger.info('accept_cookies: banner_not_found, website={}'.format(current_url))
+            self.logger.info('visit_id {}: accept_cookies: banner_not_found, website={}'.format(self.visit_id, current_url))
         
 
     def _get_cookie_banner_selectors(self, webdriver: Firefox):
@@ -135,13 +135,13 @@ class AcceptCookiesCommand(BaseCommand):
                                 button_id = button['id']
                                 found_accept_button = True
                                 webdriver.find_element_by_id(button_id).click()
-                                self.logger.info('accept_cookies: accept_button_found, website={}, id={}, call_to_action={}'.format(webdriver.current_url, button_id, encoded_call_to_action))
+                                self.logger.info('visit_id {}: accept_cookies: accept_button_found, website={}, id={}, call_to_action={}'.format(self.visit_id, webdriver.current_url, button_id, encoded_call_to_action))
                                 break
                             else:
-                                self.logger.warning('accept_cookies: accept_button_not_found_id, website={}, button={}, call_to_action={}, matched_call_to_action={}'.format(webdriver.current_url, webdriver.current_url, button, encoded_call_to_action, keyword))
+                                self.logger.warning('visit_id {}: accept_cookies: accept_button_not_found_id, website={}, button={}, call_to_action={}, matched_call_to_action={}'.format(self.visit_id, webdriver.current_url, webdriver.current_url, button, encoded_call_to_action, keyword))
 
                 except Exception as e:
-                    self.logger.error('accept_cookies: accept_button_error, website={}, button={}, error={}', webdriver.current_url, button, e)
+                    self.logger.error('visit_id {}: accept_cookies: accept_button_error, website={}, button={}, error={}'.format(self.visit_id, webdriver.current_url, button, e))
                     continue
                 
                 if found_accept_button:
@@ -149,12 +149,12 @@ class AcceptCookiesCommand(BaseCommand):
             
             if not found_accept_button:
                 if len(call_to_actions) > 10:
-                    self.logger.warning('accept_cookies: accept_button_not_found, website={}'.format(webdriver.current_url))
+                    self.logger.warning('visit_id {}: accept_cookies: accept_button_not_found, website={}'.format(self.visit_id, webdriver.current_url))
                 else:
-                    self.logger.warning('accept_cookies: accept_button_not_found, website={}, buttons={}, call_to_actions={}'.format(webdriver.current_url, buttons, call_to_actions))
+                    self.logger.warning('visit_id {}: accept_cookies: accept_button_not_found, website={}, buttons={}, call_to_actions={}'.format(self.visit_id, webdriver.current_url, buttons, call_to_actions))
 
         except Exception as e:
-            self.logger.error('accept_cookies: error when parsing cookie banner. website={}, message={}'.format(webdriver.current_url, e))
+            self.logger.error('visit_id {}: accept_cookies: error when parsing cookie banner. website={}, message={}'.format(self.visit_id, webdriver.current_url, e))
 
 
     def _keyword_matches_cta(self, keyword, encoded_call_to_action):
