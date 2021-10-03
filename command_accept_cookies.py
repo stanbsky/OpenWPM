@@ -70,7 +70,6 @@ class AcceptCookiesCommand(BaseCommand):
             element_id = element.get_attribute('id')
             if element.get_attribute('id') is None or len(element_id) == 0:
                 webdriver.execute_script("arguments[0].id = arguments[1];", element, 'custom-id-{}'.format(index)) 
-                # element.set_attribute('id', 'custom-id-{}'.format(index))
                 index += 1
 
         found_cookie_selector = self._get_cookie_banner_selectors(webdriver)
