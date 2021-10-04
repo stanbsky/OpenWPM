@@ -1,7 +1,9 @@
 from pathlib import Path
+from command_reject_cookies import RejectCookiesCommand
 
 from custom_command import LinkCountingCommand
 from command_accept_cookies import AcceptCookiesCommand
+from command_reject_cookies import RejectCookiesCommand
 from openwpm.command_sequence import CommandSequence
 from openwpm.commands.browser_commands import GetCommand
 from openwpm.config import BrowserParams, ManagerParams
@@ -12,7 +14,7 @@ from idcac_cookie_selectors import get_idcac_css_selectors
 
 # The list of sites that we wish to crawl
 NUM_BROWSERS = 1
-sites = ['https://www.finance-ni.gov.uk/']
+sites = ['https://gov.uk/']
 
 # f = open("sites.txt", "r")
 # sites = f.read().split('\n')
@@ -77,7 +79,9 @@ with TaskManager(
         # Start by visiting the page
         command_sequence.append_command(GetCommand(url=site, sleep=6), timeout=60)
 
-        command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
+        #command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
+
+        command_sequence.append_command(RejectCookiesCommand(cookie_banner_selector='#global-cookie-message'))
 
         # Run commands across all browsers (simple parallelization)
         manager.execute_command_sequence(command_sequence)
