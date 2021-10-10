@@ -20,6 +20,14 @@ reject_button_keywords = [
     re.compile(r'decline'),
     re.compile(r'nope'),
     re.compile(r'cancel'),
+    re.compile(r'no, give me more info'),
+    re.compile(r'i do not accept'),
+    re.compile(r'i do not agree'),
+    re.compile(r'disagree'),
+    re.compile(r'no, thanks'),
+    re.compile(r'no, find out more'),
+    re.compile(r'no, give me more info'),
+    re.compile(r'disable cookies'),
     re.compile(r'^no$')
 ]
 
