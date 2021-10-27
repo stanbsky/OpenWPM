@@ -40,7 +40,7 @@ class CollectCookiesCommand(BaseCommand):
             os.makedirs('./pickled_cookies')
 
         sanitized_url = self._sanitize_url(webdriver.current_url)
-        filepath = './pickled_cookies/{}_{}_{}.pkl'.format(self.visit_id, self.stage, sanitized_url)
+        filepath = './pickled_cookies/{}_{}_{}_{}.pkl'.format(self.visit_id, self.stage, sanitized_url, round(time.time()))
         self.logger.info('visit_id {}: collect_cookies: pickling_cookies, stage={}, path={}'.format(self.visit_id, self.stage, filepath))
         cookies = []
 
@@ -48,7 +48,7 @@ class CollectCookiesCommand(BaseCommand):
             cookies.append({
                 'cookie': cookie,
                 'cookie_hash': self._cookie_hash(cookie),
-                'access_date': time.time()
+                'access_date': round(time.time())
             })
 
         pickle.dump(cookies, open(filepath, 'wb'))
