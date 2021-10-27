@@ -5,7 +5,6 @@ import os
 import time 
 import hashlib
 import json
-from re import U
 
 from selenium.webdriver import Firefox
 
@@ -46,9 +45,12 @@ class CollectCookiesCommand(BaseCommand):
 
         for cookie in webdriver.get_cookies():
             cookies.append({
-                'cookie': cookie,
+                'openwpm_cookie': cookie,
                 'cookie_hash': self._cookie_hash(cookie),
-                'access_date': round(time.time())
+                'access_date': round(time.time()),
+                'stage': self.stage,
+                'original_url': webdriver.current_url,
+                'visit_id': self.visit_id
             })
 
         pickle.dump(cookies, open(filepath, 'wb'))

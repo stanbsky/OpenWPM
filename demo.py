@@ -14,7 +14,19 @@ from idcac_cookie_selectors import get_idcac_css_selectors
 
 # The list of sites that we wish to crawl
 NUM_BROWSERS = 1
-sites = ['https://gov.uk/']
+sites = [
+    'https://gov.uk/',
+    'https://gov.scot/',
+    'https://gov.wales',
+    'https://aib.gov.uk',
+    'https://census.gov.uk/',
+    'https://ccrc.gov.uk',
+    'https://cps.gov.uk',
+    'https://data.gov.uk',
+    'https://justice.gov.uk',
+    'https://tfw.wales',
+    'https://gpa.gov.uk/'
+    ]
 
 # f = open("sites.txt", "r")
 # sites = f.read().split('\n')
@@ -58,7 +70,6 @@ with TaskManager(
     None,
 ) as manager:
 
-
     css_selectors = get_idcac_css_selectors()
 
     # Visits the sites
@@ -81,7 +92,7 @@ with TaskManager(
 
         command_sequence.append_command(CollectCookiesCommand(stage='pre-accept'))
 
-        command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
+        command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors), timeout=60)
 
         command_sequence.append_command(CollectCookiesCommand(stage='post-accept'))
 
