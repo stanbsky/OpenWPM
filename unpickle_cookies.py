@@ -34,8 +34,10 @@ def connect_to_db(db_name='unpickled.sqlite'):
     return connection
 
 
-def init_db_tables(db_cursor):
+def init_db_tables(db_connection):
+    db_cursor = db_connection.cursor()
     db_cursor.execute(CREATE_COOKIE_TABLE)
+    db_connection.commit()
 
 
 def get_value_or_null(dict, key):
@@ -59,9 +61,8 @@ def unpickle_cookies(db_connection):
 
 
 def main():
-
     db_connection = connect_to_db()
-    init_db_tables(db_connection.cursor())
+    init_db_tables(db_connection)
     unpickle_cookies(db_connection)
     db_connection.close()
 
