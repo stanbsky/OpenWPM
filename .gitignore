@@ -97,3 +97,5 @@ Extension/firefox/src/content.js
 Extension/firefox/src/feature.js
 
 datadir
+
+pickled_cookies/

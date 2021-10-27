@@ -1,5 +1,5 @@
 from pathlib import Path
-from command_reject_cookies import RejectCookiesCommand
+from command_collect_cookies import CollectCookiesCommand
 
 from custom_command import LinkCountingCommand
 from command_accept_cookies import AcceptCookiesCommand
@@ -79,9 +79,11 @@ with TaskManager(
         # Start by visiting the page
         command_sequence.append_command(GetCommand(url=site, sleep=6), timeout=60)
 
-        #command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
+        command_sequence.append_command(CollectCookiesCommand(stage='pre-accept'))
 
-        command_sequence.append_command(RejectCookiesCommand(cookie_banner_selector='#global-cookie-message'))
+        command_sequence.append_command(AcceptCookiesCommand(css_selectors=css_selectors,), timeout=60)
+
+        command_sequence.append_command(CollectCookiesCommand(stage='post-accept'))
 
         # Run commands across all browsers (simple parallelization)
         manager.execute_command_sequence(command_sequence)
