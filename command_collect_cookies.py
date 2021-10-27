@@ -18,9 +18,10 @@ from command_common import *
 class CollectCookiesCommand(BaseCommand):
     """This command colelcts the cookies in a website and writes them in a persistent medium"""
 
-    def __init__(self, stage) -> None:
+    def __init__(self, stage, output_path = './datadir/pickled-cookies') -> None:
         self.logger = logging.getLogger("openwpm")
         self.stage = stage
+        self.output_path = output_path
 
     # While this is not strictly necessary, we use the repr of a command for logging
     # So not having a proper repr will make your logs a lot less useful
@@ -35,11 +36,11 @@ class CollectCookiesCommand(BaseCommand):
         extension_socket: ClientSocket,
     ) -> None:
 
-        if not os.path.exists('./pickled_cookies'):
-            os.makedirs('./pickled_cookies')
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
 
         sanitized_url = self._sanitize_url(webdriver.current_url)
-        filepath = './pickled_cookies/{}_{}_{}_{}.pkl'.format(self.visit_id, self.stage, sanitized_url, round(time.time()))
+        filepath = '{}/{}_{}_{}_{}.pkl'.format(self.output_path, self.visit_id, self.stage, sanitized_url, round(time.time()))
         self.logger.info('visit_id {}: collect_cookies: pickling_cookies, stage={}, path={}'.format(self.visit_id, self.stage, filepath))
         cookies = []
 
