@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 import os
 import pickle
@@ -389,7 +390,7 @@ class TaskManager:
                     cs.mark_done(successful)
 
     def execute_command_sequence(
-        self, command_sequence: CommandSequence, index: Optional[int] = None
+        self, command_sequence: CommandSequence, index: Optional[int] = None, seed_tar: Optional[Path] = None
     ) -> None:
         """
         parses command type and issues command(s) to the proper browser
@@ -416,6 +417,8 @@ class TaskManager:
             while True:
                 for browser in self.browsers:
                     if browser.ready():
+                        if seed_tar:
+                            self.browser_params.seed_tar = seed_tar
                         browser.current_timeout = command_sequence.total_timeout
                         thread = self._start_thread(browser, command_sequence)
                         command_executed = True
