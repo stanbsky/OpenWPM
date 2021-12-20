@@ -14,6 +14,11 @@ from openwpm.socket_interface import ClientSocket
 
 from command_common import * 
 
+from pprint import pprint
+import os
+import shutil
+import sqlite3
+
 
 class CollectCookiesCommand(BaseCommand):
     """This command colelcts the cookies in a website and writes them in a persistent medium"""
@@ -39,22 +44,15 @@ class CollectCookiesCommand(BaseCommand):
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
 
-        sanitized_url = self._sanitize_url(webdriver.current_url)
-        filepath = '{}/{}_{}_{}_{}.pkl'.format(self.output_path, self.visit_id, self.stage, sanitized_url, round(time.time()))
-        self.logger.info('visit_id {}: collect_cookies: pickling_cookies, stage={}, path={}'.format(self.visit_id, self.stage, filepath))
-        cookies = []
-
-        for cookie in webdriver.get_cookies():
-            cookies.append({
-                'openwpm_cookie': cookie,
-                'cookie_hash': self._cookie_hash(cookie),
-                'access_date': round(time.time()),
-                'stage': self.stage,
-                'original_url': webdriver.current_url,
-                'visit_id': self.visit_id
-            })
-
-        pickle.dump(cookies, open(filepath, 'wb'))
+        entry = {
+            'visit_id': self.visit_id,
+            'browser_id': self.browser_id,
+            'stage': self.stage,
+            'host': webdriver.current_url,
+            'access_date': round(time.time())
+        }
+        filepath = '{}/{}_{}_{}_{}.pkl'.format(self.output_path, self.visit_id, self.stage, self._sanitize_url(webdriver.current_url), round(time.time()))
+        pickle.dump(entry, open(filepath, 'wb'))
 
     def _sanitize_url(self, url: str):
         sanitized = url.replace('http://', '')
