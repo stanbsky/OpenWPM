@@ -34,6 +34,7 @@ from .utilities.multiprocess_utils import (
     kill_process_and_children,
     parse_traceback_for_sentry,
 )
+from .commands.utils.firefox_profile import sleep_until_sqlite_checkpoint
 
 pickling_support.install()
 
@@ -335,6 +336,22 @@ class BrowserManagerHandle:
                 "BROWSER %i: Browser manager closed successfully." % self.browser_id
             )
             shutdown_complete = True
+            
+            custom_params = self.browser_params.custom_params
+            self.logger.info("CUSTOM PARAMS: " + json.dumps(custom_params))
+            if 'dump_profile' in custom_params.keys() and custom_params['dump_profile']:
+                self.logger.info('Sleeping until checkpoint...')
+                sleep_until_sqlite_checkpoint(self.current_profile_path)
+                self.logger.info('Checkpoint reached')
+                dump_profile(
+                    browser_profile_path=self.current_profile_path,
+                    tar_path=Path(custom_params['profile_dir']).joinpath("%i.tar" % self.curr_visit_id),
+                    compress=True,
+                    browser_params=self.browser_params,
+                )
+                self.logger.info('Profile dumped?')
+
+
         finally:
             if not shutdown_complete:
                 self.kill_browser_manager()

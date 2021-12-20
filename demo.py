@@ -51,6 +51,8 @@ for browser_param in browser_params:
     browser_param.callstack_instrument = True
     # Record DNS resolution
     browser_param.dns_instrument = True
+    # Dump profile info
+    browser_param.custom_params = {'dump_profile': True, 'profile_dir': './datadir/'}
 
 # Update TaskManager configuration (use this for crawl-wide settings)
 manager_params.data_directory = Path("./datadir/")
@@ -85,6 +87,7 @@ with TaskManager(
             site,
             site_rank=index,
             callback=callback,
+            reset=True
         )
 
         # Start by visiting the page
